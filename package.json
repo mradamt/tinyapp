@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/mradamt/tinyapp/issues"
   },
-  "homepage": "https://github.com/mradamt/tinyapp#readme"
+  "homepage": "https://github.com/mradamt/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
