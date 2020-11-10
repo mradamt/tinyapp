@@ -15,6 +15,10 @@ const urlDatabase = {
 
 app.set('view engine', 'ejs');
 
+app.get('/', (req, res) => {
+  res.redirect('/urls')
+})
+
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
