@@ -41,7 +41,10 @@ app.post('/urls', (req, res) => {
 
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  if (longURL) {
+    res.redirect(longURL);
+  }
+  res.send(`<h3>404: Page Not Found</h3><p>ShortURL <i>u/${req.params.shortURL}</i> does not exist.</p>`)
 })
 
 app.listen(PORT, () => {
