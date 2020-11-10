@@ -6,10 +6,12 @@ const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
 
 app.set('view engine', 'ejs');
 
@@ -31,8 +33,10 @@ app.get('/urls/:shortURL', (req, res) => {
 })  
 
 app.post('/urls', (req, res) => {
-  console.log(req.body);
-  res.send('Ok')
+  // Add longURL from req.body to urlDatabase with key = new random string
+  const shortURL = generateRandomString()
+  urlDatabase[shortURL] = req.body.longURL
+  res.redirect(`/urls/${shortURL}`, )
 })
 
 app.listen(PORT, () => {
