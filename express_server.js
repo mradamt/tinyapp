@@ -87,6 +87,10 @@ app.get('/', (req, res) => {
   res.redirect('/urls');
 });
 app.get('/urls', (req, res) => {
+  // Log to console current status of both databases
+  console.log(users)
+  console.log(JSON.stringify(urlDatabase, null, 2))
+  
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]],
