@@ -13,10 +13,10 @@ app.use(cookieParser());
 
 
 const users = {
-  "abc1": {
-    id: "abc1",
-    email: "email@email.com",
-    password: "passwordle"
+  "aaaa": {
+    id: "aaaa",
+    email: "a@a.com",
+    password: "abc"
   },
 };
 
@@ -38,7 +38,6 @@ app.get('/register', (req, res) => {
   };
   res.render('user_registration', templateVars);
 });
-
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -60,7 +59,6 @@ app.post('/register', (req, res) => {
 app.get('/login', (req, res) => {
   res.render('login', {user: undefined})
 });
-
 app.post('/login', (req, res) =>{
   const email = req.body.email;
   const password = req.body.password;
@@ -95,7 +93,6 @@ app.get('/urls', (req, res) => {
   console.log(users);
   res.render('urls_index', templateVars);
 });
-
 app.post('/urls', (req, res) => {
   // Add longURL from req.body to urlDatabase with key = new random string length 6
   const shortURL = generateRandomString(6);
@@ -118,7 +115,6 @@ app.get('/urls/:shortURL', (req, res) => {
   };
   res.render('urls_show', templateVars);
 });
-
 app.post('/urls/:shortURL', (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect('/urls');
@@ -151,7 +147,7 @@ const generateRandomString = (length) => {
   return Math.random().toString(36).substring(2, length + 2);
 };
 
-// Allow DB lookup by key (email or id), return {user} if value matches confirmValue
+// Allow DB lookup by key (email or id), return {user} if user[key] matches confirmValue
 const lookupUserByKey = (key, confirmValue) => {
   for (const user of Object.values(users)) {
     if (user[key] === confirmValue) {
