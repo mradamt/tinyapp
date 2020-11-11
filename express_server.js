@@ -55,7 +55,7 @@ app.get('/urls', (req, res) => {
 
 app.post('/urls', (req, res) => {
   // Add longURL from req.body to urlDatabase with key = new random string
-  const shortURL = generateRandomString()
+  const shortURL = generateRandomString(6)
   urlDatabase[shortURL] = req.body.longURL
   /* Preferred behaviour: redirect to /urls after new url creation */
   // res.redirect(`/urls/${shortURL}`)
@@ -103,6 +103,6 @@ app.listen(PORT, () => {
 })
 
 
-const generateRandomString = () => {
-  return Math.random().toString(36).substring(2, 8)
+const generateRandomString = (length) => {
+  return Math.random().toString(36).substring(2, length + 2)
 }
