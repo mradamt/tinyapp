@@ -8,6 +8,14 @@ const PORT = 8080;
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
 
+const users = {
+  "abc1": {
+    id: "abc1",
+    email: "email@email.com",
+    password: "passwordle"
+  },
+}
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
