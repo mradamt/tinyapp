@@ -104,9 +104,10 @@ app.get('/u/:shortURL', (req, res) => {
   if (longURL) {
     res.redirect(longURL);
   }
-  res.send(`<h3>404: Page Not Found</h3><p>ShortURL <em>u/${req.params.shortURL}</em> does not exist.</p>`);
+  res.status(404).send(`<h3>404: Page Not Found</h3><p>ShortURL <em>u/${req.params.shortURL}</em> does not exist.</p>`);
 });
 
+// TODO: should below be .use or .get?
 app.use(function(req, res, next) {
   return res.status(404).send(`<h3>404: Page Not Found</h3>`);
 });
