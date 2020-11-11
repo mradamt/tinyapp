@@ -44,17 +44,16 @@ app.post('/register', (req, res) => {
   const password = req.body.password;
   // If email or password are blank, return status 400
   if (!email || !password) {
-    res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>')
+    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>')
   }
   // If email already exists in DB, return status 400
-  if (checkUsersKeyVal('email', email)) {
-    res.status(400).send(`<h3>Error:</h3><p><em>${email}</em> is already registered</p>`)
-    console.log('heyhyhehahahahahhahahahaah')
+  if (lookupUserByKey('email', email)) {
+    return res.status(400).send(`<h3>Error:</h3><p><em>${email}</em> is already registered</p>`)
   }
-  // For this app we are unlikely to see more than 36^4 users, so id length = 4
+  // Generate new id and add this new user object to users
   const id = generateRandomString(4);
   users[id] = { id, email, password };
-  res.cookie('user_id', user_id);
+  res.cookie('user_id', id);
   res.redirect('/urls');
 });
 
@@ -136,11 +135,12 @@ const generateRandomString = (length) => {
   return Math.random().toString(36).substring(2, length + 2);
 };
 
-const checkUsersKeyVal = (key, value) => {
+// Allow DB lookup by key (email or id), return {user} if value matches confirmValue
+const lookupUserByKey = (key, confirmValue) => {
   for (const user of Object.values(users)) {
-    if (user[key] === value) {
-      return true;
+    if (user[key] === confirmValue) {
+      return user;
     }
   }
-  return false;
+  return;
 };
