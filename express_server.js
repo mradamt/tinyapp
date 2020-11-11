@@ -18,6 +18,7 @@ const users = {
     email: "a@a.com",
     password: "abc"
   },
+  "bbbb": { id: "bbbb", email: "b@b.com", password: "abc" },
 };
 
 const urlDatabase = {
