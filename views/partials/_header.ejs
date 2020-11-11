@@ -8,13 +8,22 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <span class="navbar-text ml-5 mr-2"><%= username %></span>
-        <form class="form-inline my-2 my-lg-0" action="/login" method="POST">
-          <div class="form-group mr-sm-2">
-            <input class="form-control" type="text" name="username" placeholder="username" aria-label="username">
-            <button type="submit" class="btn btn-outline-dark my-2 my-sm-0 mx-2">Sign in</button>
-          </div>
-        </form>
+        <% if (username) { %>
+          <span class="navbar-text ml-5 mr-2">Logged in as: <%= username %></span>
+          <form class="form-inline my-2 my-lg-0" action="/logout" method="POST">
+            <!-- <div class="form-group mr-sm-2"> -->
+              <!-- <input class="form-control" type="text" name="username" placeholder="username" aria-label="username"> -->
+              <button type="submit" name="" class="btn btn-outline-dark my-2 my-sm-0 mx-2">Logout</button>
+            <!-- </div> -->
+          </form>
+        <% } else { %>
+          <form class="form-inline my-2 my-lg-0" action="/login" method="POST">
+            <div class="form-group mr-sm-2">
+              <input class="form-control" type="text" name="username" placeholder="username" aria-label="username">
+              <button type="submit" class="btn btn-outline-dark my-2 my-sm-0 mx-2">Sign in</button>
+            </div>
+          </form>
+        <% } %>
       </div>
     </div>
   </nav>
