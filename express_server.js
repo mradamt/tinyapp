@@ -86,6 +86,10 @@ app.get('/u/:shortURL', (req, res) => {
   res.send(`<h3>404: Page Not Found</h3><p>ShortURL <em>u/${req.params.shortURL}</em> does not exist.</p>`)
 })
 
+app.use(function(req, res, next) {
+  return res.status(404).send(`<h3>404: Page Not Found</h3>`);
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`)
 })
