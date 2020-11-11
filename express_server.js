@@ -20,6 +20,13 @@ app.get('/', (req, res) => {
   res.redirect('/urls')
 })
 
+app.get('/register', (req, res) => {
+  const templateVars = { 
+    username: req.cookies["username"], 
+  };
+  res.render('user_registration', templateVars);
+})
+
 app.post('/login', (req, res) =>{
   res.cookie('username', req.body.username)
   res.redirect('/urls')
