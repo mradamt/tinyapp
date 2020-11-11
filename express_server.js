@@ -103,8 +103,11 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  const templateVars = { user: users[req.cookies["user_id"]] };
-  res.render('urls_new', templateVars);
+  const user = users[req.cookies["user_id"]];
+  if (!user) {
+    return res.status(304).redirect('/login');
+  }
+  res.render('urls_new', {'user': user});
 });
 
 app.get('/urls/:shortURL', (req, res) => {
