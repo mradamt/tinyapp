@@ -29,9 +29,6 @@ const urlDatabase = {
 
 app.set('view engine', 'ejs');
 
-app.get('/', (req, res) => {
-  res.redirect('/urls');
-});
 
 app.get('/register', (req, res) => {
   const templateVars = {
@@ -86,12 +83,14 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+app.get('/', (req, res) => {
+  res.redirect('/urls');
+});
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies["user_id"]],
   };
-  console.log(users);
   res.render('urls_index', templateVars);
 });
 app.post('/urls', (req, res) => {
@@ -104,7 +103,7 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  const user = users[req.cookies["user_id"]];
+  const user = users[req.cookies.user_id];
   if (!user) {
     return res.status(304).redirect('/login');
   }
@@ -115,7 +114,7 @@ app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    user: users[req.cookies["user_id"]],
+    user: users[req.cookies.user_id],
   };
   res.render('urls_show', templateVars);
 });
@@ -132,7 +131,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   if (longURL) {
-    res.redirect(longURL);
+    return res.redirect(longURL);
   }
   res.status(404).send(`<h3>404: Page Not Found</h3><p>ShortURL <em>u/${req.params.shortURL}</em> does not exist.</p>`);
 });
@@ -143,7 +142,7 @@ app.use(function(req, res, next) {
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`TinyApp listening on port ${PORT}`);
 });
 
 
