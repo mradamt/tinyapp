@@ -62,7 +62,23 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) =>{
-  res.cookie('user_id', req.body.username);
+  const email = req.body.email;
+  const password = req.body.password;
+  // If email or password are blank, return status 400
+  if (!email || !password) {
+    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>')
+  }
+  // Confirm user exists
+  user = lookupUserByKey('email', email)
+  if (!user) {
+    return res.status(403).send('<h3>Error:</h3><p>User account not found</p>')
+  }
+  // Confirm password is correct
+  if (user.password !== password) {
+    return res.status(403).send('<h3>Error:</h3><p>Permission denied</p>')
+  }
+  const user_id = user.id
+  res.cookie('user_id', user_id);
   res.redirect('/urls');
 });
 
