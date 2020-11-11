@@ -1,11 +1,12 @@
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 const express = require('express');
 const app = express();
 const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
-
+app.use(cookieParser())
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
