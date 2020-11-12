@@ -2,6 +2,8 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+// Internal modules
+const { generateRandomString, lookupUserByKey, urlsForUser } = require('./helpers')
 
 
 const express = require('express');
@@ -189,28 +191,3 @@ app.use(function(req, res, next) {
 app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}`);
 });
-
-
-const generateRandomString = (length) => {
-  return Math.random().toString(36).substring(2, length + 2);
-};
-
-// Allow DB lookup by key (email or id), return {user} if user[key] matches confirmValue
-const lookupUserByKey = (database, key, confirmValue) => {
-  for (const user of Object.values(database)) {
-    if (user[key] === confirmValue) {
-      return user;
-    }
-  }
-  return;
-};
-
-const urlsForUser = (urlDatabase, id) => {
-  const userUrls = {};
-  for (const [shortURL, urlObj] of Object.entries(urlDatabase)) {
-    if (urlObj.user_id === id) {
-      userUrls[shortURL] = urlObj;
-    }
-  }
-  return userUrls;
-};
