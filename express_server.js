@@ -1,15 +1,16 @@
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
+// External modules
+const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
 // Internal modules
 const { generateRandomString, lookupUserByKey, urlsForUser } = require('./helpers')
 
-
-const express = require('express');
+// Setup Express 'app'
 const app = express();
 const PORT = 8080;
-
+app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -17,7 +18,7 @@ app.use(cookieSession({
   keys: ['key1', 'key2']
 }));
 
-
+// Define dummy databases
 const users = {
   "aaaa": {
     id: "aaaa",
@@ -36,9 +37,7 @@ const urlDatabase = {
 };
 
 
-app.set('view engine', 'ejs');
-
-
+// Define routes (sorted by route then method)
 app.get('/register', (req, res) => {
   const templateVars = {
     user: users[req.session.user_id],
@@ -182,6 +181,7 @@ app.get('/u/:shortURL', (req, res) => {
     <h3>404: Page Not Found</h3>
     <p>ShortURL <strong>u/${req.params.shortURL}</strong> does not exist.</p>`);
 });
+
 
 // TODO: should below be .use or .get?
 app.use(function(req, res, next) {
