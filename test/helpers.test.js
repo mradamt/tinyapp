@@ -20,51 +20,51 @@ const testURLs = {
 };
 
 
-describe('generateRandomString', function () {
-  it('should return a string of length requested', function () {
-    const generatedLength = generateRandomString(6).length
-    const expectedOutput = 6
+describe('generateRandomString', function() {
+  it('should return a string of length requested', function() {
+    const generatedLength = generateRandomString(6).length;
+    const expectedOutput = 6;
     assert.equal(generatedLength, expectedOutput);
   });
-})
+});
 
-describe('lookupUserByKey', function () {
-  it('should return a user when given a valid email', function () {
-    const user = lookupUserByKey(testUsers, 'email', 'a@a.com')
-    const expectedOutput = testUsers.aaaa
+describe('lookupUserByKey', function() {
+  it('should return a user when given a valid email', function() {
+    const user = lookupUserByKey(testUsers, 'email', 'a@a.com');
+    const expectedOutput = testUsers.aaaa;
     assert.equal(user, expectedOutput);
   });
 
-  it('should return undefined when given an invalid email', function () {
-    const user = lookupUserByKey(testUsers, 'email', 'doesnotexist@a.com')
-    const expectedOutput = undefined
+  it('should return undefined when given an invalid email', function() {
+    const user = lookupUserByKey(testUsers, 'email', 'doesnotexist@a.com');
+    const expectedOutput = undefined;
     assert.equal(user, expectedOutput);
   });
 
-  it('should return a user when given a valid userID', function () {
-    const user = lookupUserByKey(testUsers, 'id', 'aaaa')
-    const expectedOutput = testUsers.aaaa
+  it('should return a user when given a valid userID', function() {
+    const user = lookupUserByKey(testUsers, 'id', 'aaaa');
+    const expectedOutput = testUsers.aaaa;
     assert.equal(user, expectedOutput);
   });
 
-  it('should return undefined when given an invalid id', function () {
-    const user = lookupUserByKey(testUsers, 'id', 'abab')
-    const expectedOutput = undefined
+  it('should return undefined when given an invalid id', function() {
+    const user = lookupUserByKey(testUsers, 'id', 'abab');
+    const expectedOutput = undefined;
     assert.equal(user, expectedOutput);
   });
-})
+});
 
-describe('urlsForUser', function () {
-  it('should return a list of URLs when given an id that owns URLs', function () {
-    const user = urlsForUser(testURLs, 'aaaa')
-    const expectedOutput = testURLs
+describe('urlsForUser', function() {
+  it('should return a list of URLs when given an id that owns URLs', function() {
+    const user = urlsForUser(testURLs, 'aaaa');
+    const expectedOutput = testURLs;
     assert.deepEqual(user, expectedOutput);
   });
 
-  it('should return an empty object when given an id that owns no URLs', function () {
-    const user = urlsForUser(testUsers, 'bbbb')
-    const expectedOutput = {}
+  it('should return an empty object when given an id that owns no URLs', function() {
+    const user = urlsForUser(testUsers, 'bbbb');
+    const expectedOutput = {};
     assert.deepEqual(user, expectedOutput);
   });
-})
+});
 

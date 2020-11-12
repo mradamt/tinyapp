@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 // Internal modules
-const { generateRandomString, lookupUserByKey, urlsForUser } = require('./helpers')
+const { generateRandomString, lookupUserByKey, urlsForUser } = require('./helpers');
 
 // Setup Express 'app'
 const app = express();
