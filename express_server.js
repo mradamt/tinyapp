@@ -51,7 +51,7 @@ app.post('/register', (req, res) => {
     return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>');
   }
   // If email already exists in DB, return status 400
-  if (lookupUserByKey('email', email)) {
+  if (lookupUserByKey(users, 'email', email)) {
     return res.status(400).send(`<h3>Error:</h3><p><em>${email}</em> is already registered</p>`);
   }
   // Generate new id, hash password, then add this new user object to users
@@ -73,7 +73,7 @@ app.post('/login', (req, res) =>{
     return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>');
   }
   // Confirm user exists
-  user = lookupUserByKey('email', email);
+  user = lookupUserByKey(users, 'email', email);
   if (!user) {
     return res.status(403).send('<h3>Error:</h3><p>User account not found</p>');
   }
@@ -104,7 +104,7 @@ app.get('/urls', (req, res) => {
     return res.render('urls_index', {urls: undefined, user: undefined});
   }
   const templateVars = {
-    urls: urlsForUser(user.id),
+    urls: urlsForUser(urlDatabase, user.id),
     user: users[req.session.user_id],
   };
   res.render('urls_index', templateVars);
@@ -132,7 +132,7 @@ app.get('/urls/:shortURL', (req, res) => {
   if (!user) {
     return res.status(304).redirect('/login');
   }
-  const usersShortURLs = Object.keys(urlsForUser(user.id));
+  const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send(`
@@ -149,7 +149,7 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 app.post('/urls/:shortURL', (req, res) => {
   const user = users[req.session.user_id];
-  const usersShortURLs = Object.keys(urlsForUser(user.id));
+  const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send('401: Unauthorised. You do not have permission to edit this record');
@@ -161,7 +161,7 @@ app.post('/urls/:shortURL', (req, res) => {
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session.user_id];
-  const usersShortURLs = Object.keys(urlsForUser(user.id));
+  const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send('401: Unauthorised. You do not have permission to delete this record');
@@ -196,8 +196,8 @@ const generateRandomString = (length) => {
 };
 
 // Allow DB lookup by key (email or id), return {user} if user[key] matches confirmValue
-const lookupUserByKey = (key, confirmValue) => {
-  for (const user of Object.values(users)) {
+const lookupUserByKey = (database, key, confirmValue) => {
+  for (const user of Object.values(database)) {
     if (user[key] === confirmValue) {
       return user;
     }
@@ -205,7 +205,7 @@ const lookupUserByKey = (key, confirmValue) => {
   return;
 };
 
-const urlsForUser = (id) => {
+const urlsForUser = (urlDatabase, id) => {
   const userUrls = {};
   for (const [shortURL, urlObj] of Object.entries(urlDatabase)) {
     if (urlObj.user_id === id) {
