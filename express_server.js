@@ -99,7 +99,7 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   // Add longURL from req.body to urlDatabase with key = new random string length 6
   const shortURL = generateRandomString(6);
-  urlDatabase[shortURL] = { longURL: req.body.longURL, userID: req.cookies.user_id };
+  urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.cookies.user_id };
   /* Preferred behaviour: redirect to /urls after new url creation */
   // res.redirect(`/urls/${shortURL}`)
   res.redirect(`/urls/`);
