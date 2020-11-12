@@ -85,8 +85,6 @@ app.post('/logout', (req, res) => {
 app.get('/', (req, res) => {
   res.redirect('/urls');
 });
-// Filter this page to only display logged-in user's URLs
-// If not logged in, display splash page leading to login/register
 app.get('/urls', (req, res) => {
   // Log to console current status of both databases
   console.log(users)
@@ -120,6 +118,19 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
+  const user = users[req.cookies.user_id];
+  // If user not logged in, redirect to login
+  if (!user) {
+    return res.status(304).redirect('/login');
+  }
+  const usersShortURLs = Object.keys(urlsForUser(user.id))
+  // If user does not 'own' this shortURL return 401
+  if (!usersShortURLs.includes(req.params.shortURL)) {
+    return res.status(401).send(`
+      <h3>401: Unauthorised</h3>
+      <p>You do not have permission to edit this record</p>`);
+  }
+  // User owns this shortURL, proceed with edit GET
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
@@ -128,21 +139,37 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 app.post('/urls/:shortURL', (req, res) => {
+  const user = users[req.cookies.user_id];
+  const usersShortURLs = Object.keys(urlsForUser(user.id))
+  // If user does not 'own' this shortURL return 401
+  if (!usersShortURLs.includes(req.params.shortURL)) {
+    return res.status(401).send('401: Unauthorised. You do not have permission to edit this record');
+  }
+  // User owns this shortURL, proceed with edit POST
   urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
+  const user = users[req.cookies.user_id];
+  const usersShortURLs = Object.keys(urlsForUser(user.id))
+  // If user does not 'own' this shortURL return 401
+  if (!usersShortURLs.includes(req.params.shortURL)) {
+    return res.status(401).send('401: Unauthorised. You do not have permission to delete this record');
+  }
+  // User owns this shortURL, proceed with delete POST
   delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  return res.redirect('/urls');
 });
 
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  if (longURL) {
-    return res.redirect(longURL);
+  const urlObj = urlDatabase[req.params.shortURL];
+  if (urlObj) {
+    return res.redirect(urlObj.longURL);
   }
-  res.status(404).send(`<h3>404: Page Not Found</h3><p>ShortURL <em>u/${req.params.shortURL}</em> does not exist.</p>`);
+  res.status(404).send(`
+    <h3>404: Page Not Found</h3>
+    <p>ShortURL <strong>u/${req.params.shortURL}</strong> does not exist.</p>`);
 });
 
 // TODO: should below be .use or .get?
