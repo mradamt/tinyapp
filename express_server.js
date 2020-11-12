@@ -37,13 +37,15 @@ const urlDatabase = {
 };
 
 
-// Define routes (sorted by route then method)
+/* Define routes (sorted by route then method) */
+// VIEW REGISTER PAGE
 app.get('/register', (req, res) => {
   const templateVars = {
     user: users[req.session.user_id],
   };
   res.render('user_registration', templateVars);
 });
+// POST: REGISTER NEW USER
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const plainPassword = req.body.password;
@@ -63,9 +65,11 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+// VIEW LOGIN PAGE
 app.get('/login', (req, res) => {
   res.render('login', {user: undefined});
 });
+// POST: USER LOGIN AND AUTHENTICATION
 app.post('/login', (req, res) =>{
   const email = req.body.email;
   const plainPassword = req.body.password;
@@ -86,12 +90,13 @@ app.post('/login', (req, res) =>{
   req.session.user_id = id;
   res.redirect('/urls');
 });
-
+// POST: LOGOUT
 app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/urls');
 });
 
+// LIST USER'S URLS
 app.get('/', (req, res) => {
   res.redirect('/urls');
 });
@@ -110,15 +115,16 @@ app.get('/urls', (req, res) => {
   };
   res.render('urls_index', templateVars);
 });
+// POST: GENERATE NEW URL
 app.post('/urls', (req, res) => {
   // Add longURL from req.body to urlDatabase with key = new random string length 6
   const shortURL = generateRandomString(6);
   urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.session.user_id };
-  /* Preferred behaviour: redirect to /urls after new url creation */
-  // res.redirect(`/urls/${shortURL}`)
+  /* Preferred behaviour: redirect to /urls after new url creation, otherwise: // res.redirect(`/urls/${shortURL}`) */
   res.redirect(`/urls/`);
 });
 
+// PAGE TO CREATE NEW URL
 app.get('/urls/new', (req, res) => {
   const user = users[req.session.user_id];
   if (!user) {
@@ -127,6 +133,7 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new', {'user': user});
 });
 
+// PAGE TO EDIT EXISTING URL
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.user_id];
   // If user not logged in, redirect to login
@@ -148,6 +155,7 @@ app.get('/urls/:shortURL', (req, res) => {
   };
   res.render('urls_show', templateVars);
 });
+// POST: EDIT EXISTING URL
 app.post('/urls/:shortURL', (req, res) => {
   const user = users[req.session.user_id];
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
@@ -160,6 +168,7 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
+// DELETE EXISTING URL
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session.user_id];
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
@@ -172,6 +181,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   return res.redirect('/urls');
 });
 
+// VISIT TINYURL (FOR REDIRECT)
 app.get('/u/:shortURL', (req, res) => {
   const urlObj = urlDatabase[req.params.shortURL];
   if (urlObj) {
@@ -183,10 +193,11 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 
-// TODO: should below be .use or .get?
+// CATCHALL ERROR HANDLER FOR NON-EXISTANT ROUTES
 app.use(function(req, res, next) {
   return res.status(404).send(`<h3>404: Page Not Found</h3>`);
 });
+
 
 app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}`);
