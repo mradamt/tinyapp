@@ -1,6 +1,7 @@
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 
 
 const express = require('express');
@@ -16,9 +17,13 @@ const users = {
   "aaaa": {
     id: "aaaa",
     email: "a@a.com",
-    password: "abc"
+    password: "$2b$10$4vcj0i4jQ10Cf2mLS9d6muS3UHNhciJP5Xtsh.rB2j8xF1zJVcoeS"
   },
-  "bbbb": { id: "bbbb", email: "b@b.com", password: "abc" },
+  "bbbb": { 
+    id: "bbbb", 
+    email: "b@b.com", 
+    password: "$2b$10$5iveLn/S2KdRArRYTkYFKezgWP5WQiYhX6WOzFcER1HyMADuIRA/." 
+  },
 };
 const urlDatabase = {
   "b2xVn2": {longURL: "http://www.lighthouselabs.ca", user_id: "aaaa"},
@@ -37,17 +42,18 @@ app.get('/register', (req, res) => {
 });
 app.post('/register', (req, res) => {
   const email = req.body.email;
-  const password = req.body.password;
+  const plainPassword = req.body.password;
   // If email or password are blank, return status 400
-  if (!email || !password) {
+  if (!email || !plainPassword) {
     return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>')
   }
   // If email already exists in DB, return status 400
   if (lookupUserByKey('email', email)) {
     return res.status(400).send(`<h3>Error:</h3><p><em>${email}</em> is already registered</p>`)
   }
-  // Generate new id and add this new user object to users
+  // Generate new id, hash password, then add this new user object to users
   const id = generateRandomString(4);
+  const password = bcrypt.hashSync(plainPassword, 10)
   users[id] = { id, email, password };
   res.cookie('user_id', id);
   res.redirect('/urls');
@@ -58,9 +64,9 @@ app.get('/login', (req, res) => {
 });
 app.post('/login', (req, res) =>{
   const email = req.body.email;
-  const password = req.body.password;
+  const plainPassword = req.body.password;
   // If email or password are blank, return status 400
-  if (!email || !password) {
+  if (!email || !plainPassword) {
     return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>')
   }
   // Confirm user exists
@@ -69,7 +75,7 @@ app.post('/login', (req, res) =>{
     return res.status(403).send('<h3>Error:</h3><p>User account not found</p>')
   }
   // Confirm password is correct
-  if (user.password !== password) {
+  if (!bcrypt.compareSync(plainPassword, user.password)) {
     return res.status(403).send('<h3>Error:</h3><p>Permission denied</p>')
   }
   const user_id = user.id
