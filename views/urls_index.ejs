@@ -11,36 +11,54 @@
 <body>
   <%- include('partials/_header') %>
   <main style="margin: 1em;">
-    <h3>My URLs</h3>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Short URL</th>
-          <th scope="col">Long URL</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Delete</th>
-        </tr>
-        <tbody>
-          <% for (let url in urls) { %>
+    <% if ( user ) { %>
+      <h3>My URLs</h3>
+      <% if ( Object.keys(urls).length === 0 ) { %>
+        <p class="mt-4">Create your first TinyURL</p>
+        <div class="form-inline my-2 mr-sm-2">
+          <a href="/urls/new" class="btn btn-outline-primary mr-2">New TinyURL</a>
+        </div>
+      <% } else { %>
+        <table class="table">
+          <thead>
             <tr>
-              <td><a href="u/<%= url%>"><%= url%></a></td>
-              <td><a href="<%= urls[url]%>"><%= urls[url].longURL%></a></td>
-              <td>
-                <form method="GET" action="/urls/<%= url%>">
-                  <button type="submit" class="btn btn-outline-warning">Edit</button>
-                </form>
-              </td>
-              <td>
-                <form method="POST" action="/urls/<%= url%>/delete">
-                  <button type="submit" class="btn btn-outline-danger">Delete</button>
-                </form>
-              </td>
+              <th scope="col">Short URL</th>
+              <th scope="col">Long URL</th>
+              <th scope="col">Edit</th>
+              <th scope="col">Delete</th>
             </tr>
-            <% }%>
-        </tbody>
-      </thead>
-    </table>
-  </main>
+            <tbody>
+              <% for (let url in urls) { %>
+                <tr>
+                  <td><a href="u/<%= url%>"><%= url%></a></td>
+                  <td><a href="<%= urls[url]%>"><%= urls[url].longURL%></a></td>
+                  <td>
+                    <form method="GET" action="/urls/<%= url%>">
+                      <button type="submit" class="btn btn-outline-warning">Edit</button>
+                    </form>
+                  </td>
+                  <td>
+                    <form method="POST" action="/urls/<%= url%>/delete">
+                      <button type="submit" class="btn btn-outline-danger">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }%>
+            </tbody>
+          </thead>
+        </table>
+      <% } %>
+    <% } else { %>
+      <h3>TinyApp - the best URL shortener</h3>
+      <small>... that I've made, so far</small>
+      <p class="mt-4">To use all three fantastic features of TinyApp</p>
+      <div class="form-inline my-2 mr-sm-2">
+        <a href="/login" class="btn btn-outline-primary mr-2">Login</a>
+        or
+        <a href="/register" class="btn btn-outline-secondary mx-2">Register</a>
+      </div>
+    <% } %>
+    </main>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

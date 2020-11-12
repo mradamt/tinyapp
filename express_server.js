@@ -22,7 +22,7 @@ const users = {
 };
 const urlDatabase = {
   "b2xVn2": {longURL: "http://www.lighthouselabs.ca", user_id: "aaaa"},
-  "9sm5xK": {longURL: "http://www.google.com", user_id: "bbbb"}
+  "9sm5xK": {longURL: "http://www.google.com", user_id: "aaaa"}
 };
 
 
@@ -85,14 +85,20 @@ app.post('/logout', (req, res) => {
 app.get('/', (req, res) => {
   res.redirect('/urls');
 });
+// Filter this page to only display logged-in user's URLs
+// If not logged in, display splash page leading to login/register
 app.get('/urls', (req, res) => {
   // Log to console current status of both databases
   console.log(users)
   console.log(JSON.stringify(urlDatabase, null, 2))
   
+  const user = users[req.cookies.user_id];
+  if (!user) {
+    return res.render('urls_index', {urls: undefined, user: undefined})
+  }
   const templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]],
+    urls: urlsForUser(user.id),
+    user: users[req.cookies.user_id],
   };
   res.render('urls_index', templateVars);
 });
@@ -162,3 +168,13 @@ const lookupUserByKey = (key, confirmValue) => {
   }
   return;
 };
+
+const urlsForUser = (id) => {
+  const userUrls = {};
+  for (const [shortURL, urlObj] of Object.entries(urlDatabase)) {
+    if (urlObj.user_id === id) {
+      userUrls[shortURL] = urlObj
+    }
+  }
+  return userUrls
+}
