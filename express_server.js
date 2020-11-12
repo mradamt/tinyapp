@@ -1,6 +1,6 @@
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 
 
@@ -10,7 +10,10 @@ const PORT = 8080;
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}));
 
 
 const users = {
@@ -55,7 +58,7 @@ app.post('/register', (req, res) => {
   const id = generateRandomString(4);
   const password = bcrypt.hashSync(plainPassword, 10)
   users[id] = { id, email, password };
-  res.cookie('user_id', id);
+  req.session.user_id = id;
   res.redirect('/urls');
 });
 
@@ -78,13 +81,13 @@ app.post('/login', (req, res) =>{
   if (!bcrypt.compareSync(plainPassword, user.password)) {
     return res.status(403).send('<h3>Error:</h3><p>Permission denied</p>')
   }
-  const user_id = user.id
-  res.cookie('user_id', user_id);
+  const id = user.id;
+  req.session.user_id = id;
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls');
 });
 
@@ -96,13 +99,13 @@ app.get('/urls', (req, res) => {
   console.log(users)
   console.log(JSON.stringify(urlDatabase, null, 2))
   
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   if (!user) {
     return res.render('urls_index', {urls: undefined, user: undefined})
   }
   const templateVars = {
     urls: urlsForUser(user.id),
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
   res.render('urls_index', templateVars);
 });
@@ -116,7 +119,7 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   if (!user) {
     return res.status(304).redirect('/login');
   }
@@ -124,7 +127,7 @@ app.get('/urls/new', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   // If user not logged in, redirect to login
   if (!user) {
     return res.status(304).redirect('/login');
@@ -140,13 +143,13 @@ app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.cookies.user_id],
+    user: users[req.session.user_id],
   };
   res.render('urls_show', templateVars);
 });
 app.post('/urls/:shortURL', (req, res) => {
-  const user = users[req.cookies.user_id];
   const usersShortURLs = Object.keys(urlsForUser(user.id))
+  const user = users[req.session.user_id];
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send('401: Unauthorised. You do not have permission to edit this record');
@@ -157,8 +160,8 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const user = users[req.cookies.user_id];
   const usersShortURLs = Object.keys(urlsForUser(user.id))
+  const user = users[req.session.user_id];
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send('401: Unauthorised. You do not have permission to delete this record');
