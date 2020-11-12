@@ -22,10 +22,10 @@ const users = {
     email: "a@a.com",
     password: "$2b$10$4vcj0i4jQ10Cf2mLS9d6muS3UHNhciJP5Xtsh.rB2j8xF1zJVcoeS"
   },
-  "bbbb": { 
-    id: "bbbb", 
-    email: "b@b.com", 
-    password: "$2b$10$5iveLn/S2KdRArRYTkYFKezgWP5WQiYhX6WOzFcER1HyMADuIRA/." 
+  "bbbb": {
+    id: "bbbb",
+    email: "b@b.com",
+    password: "$2b$10$5iveLn/S2KdRArRYTkYFKezgWP5WQiYhX6WOzFcER1HyMADuIRA/."
   },
 };
 const urlDatabase = {
@@ -39,7 +39,7 @@ app.set('view engine', 'ejs');
 
 app.get('/register', (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]],
+    user: users[req.session.user_id],
   };
   res.render('user_registration', templateVars);
 });
@@ -48,38 +48,38 @@ app.post('/register', (req, res) => {
   const plainPassword = req.body.password;
   // If email or password are blank, return status 400
   if (!email || !plainPassword) {
-    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>')
+    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>');
   }
   // If email already exists in DB, return status 400
   if (lookupUserByKey('email', email)) {
-    return res.status(400).send(`<h3>Error:</h3><p><em>${email}</em> is already registered</p>`)
+    return res.status(400).send(`<h3>Error:</h3><p><em>${email}</em> is already registered</p>`);
   }
   // Generate new id, hash password, then add this new user object to users
   const id = generateRandomString(4);
-  const password = bcrypt.hashSync(plainPassword, 10)
+  const password = bcrypt.hashSync(plainPassword, 10);
   users[id] = { id, email, password };
   req.session.user_id = id;
   res.redirect('/urls');
 });
 
 app.get('/login', (req, res) => {
-  res.render('login', {user: undefined})
+  res.render('login', {user: undefined});
 });
 app.post('/login', (req, res) =>{
   const email = req.body.email;
   const plainPassword = req.body.password;
   // If email or password are blank, return status 400
   if (!email || !plainPassword) {
-    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>')
+    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>');
   }
   // Confirm user exists
-  user = lookupUserByKey('email', email)
+  user = lookupUserByKey('email', email);
   if (!user) {
-    return res.status(403).send('<h3>Error:</h3><p>User account not found</p>')
+    return res.status(403).send('<h3>Error:</h3><p>User account not found</p>');
   }
   // Confirm password is correct
   if (!bcrypt.compareSync(plainPassword, user.password)) {
-    return res.status(403).send('<h3>Error:</h3><p>Permission denied</p>')
+    return res.status(403).send('<h3>Error:</h3><p>Permission denied</p>');
   }
   const id = user.id;
   req.session.user_id = id;
@@ -96,12 +96,12 @@ app.get('/', (req, res) => {
 });
 app.get('/urls', (req, res) => {
   // Log to console current status of both databases
-  console.log(users)
-  console.log(JSON.stringify(urlDatabase, null, 2))
+  console.log(users);
+  console.log(JSON.stringify(urlDatabase, null, 2));
   
   const user = users[req.session.user_id];
   if (!user) {
-    return res.render('urls_index', {urls: undefined, user: undefined})
+    return res.render('urls_index', {urls: undefined, user: undefined});
   }
   const templateVars = {
     urls: urlsForUser(user.id),
@@ -112,7 +112,7 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   // Add longURL from req.body to urlDatabase with key = new random string length 6
   const shortURL = generateRandomString(6);
-  urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.cookies.user_id };
+  urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.session.user_id };
   /* Preferred behaviour: redirect to /urls after new url creation */
   // res.redirect(`/urls/${shortURL}`)
   res.redirect(`/urls/`);
@@ -132,7 +132,7 @@ app.get('/urls/:shortURL', (req, res) => {
   if (!user) {
     return res.status(304).redirect('/login');
   }
-  const usersShortURLs = Object.keys(urlsForUser(user.id))
+  const usersShortURLs = Object.keys(urlsForUser(user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send(`
@@ -148,8 +148,8 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 app.post('/urls/:shortURL', (req, res) => {
-  const usersShortURLs = Object.keys(urlsForUser(user.id))
   const user = users[req.session.user_id];
+  const usersShortURLs = Object.keys(urlsForUser(user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send('401: Unauthorised. You do not have permission to edit this record');
@@ -160,8 +160,8 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const usersShortURLs = Object.keys(urlsForUser(user.id))
   const user = users[req.session.user_id];
+  const usersShortURLs = Object.keys(urlsForUser(user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
     return res.status(401).send('401: Unauthorised. You do not have permission to delete this record');
@@ -209,8 +209,8 @@ const urlsForUser = (id) => {
   const userUrls = {};
   for (const [shortURL, urlObj] of Object.entries(urlDatabase)) {
     if (urlObj.user_id === id) {
-      userUrls[shortURL] = urlObj
+      userUrls[shortURL] = urlObj;
     }
   }
-  return userUrls
-}
+  return userUrls;
+};
