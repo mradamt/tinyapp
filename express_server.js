@@ -15,7 +15,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
-  keys: ['key1', 'key2']
+  keys: ['aeb7', 'l92b']
 }));
 
 // Define dummy databases
