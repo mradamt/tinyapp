@@ -3,6 +3,7 @@ const express = require('express');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const methodOverride = require('method-override');
 const morgan = require('morgan');
 // Internal modules
 const { generateRandomString, lookupUserByKey, urlsForUser } = require('./helpers');
@@ -17,6 +18,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['aeb7', 'l92b']
 }));
+app.use(methodOverride('_method'));
 
 // Define dummy databases
 const users = {
@@ -176,7 +178,7 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 // POST: EDIT EXISTING URL
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => {
   const user = users[req.session.user_id];
   // If user not logged in, return status 401
   if (!user) {
@@ -195,7 +197,7 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 // DELETE EXISTING URL
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session.user_id];
   // If user not logged in, return status 401
   if (!user) {
