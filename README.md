@@ -9,10 +9,10 @@ Basic analytics are provided on the Edit page for each short URL:
 
 ## Final Product
 
-!["Screenshot: TinyApp landing page"](https://raw.githubusercontent.com/mradamt/tinyapp/master/docs/Screen%20Shot%202020-11-12%20at%204.42.55%20PM.png)
-!["Screenshot: My URLs, listing user's shortened URLs"](https://raw.githubusercontent.com/mradamt/tinyapp/master/docs/Screen%20Shot%202020-11-12%20at%204.40.51%20PM.png)
-!["Screenshot: Create new TinyURL"](https://raw.githubusercontent.com/mradamt/tinyapp/master/docs/Screen%20Shot%202020-11-12%20at%204.43.37%20PM.png)
-!["Screenshot: Edit previously created TinyURL"](https://github.com/mradamt/tinyapp/blob/master/docs/Screen%20Shot%202020-11-12%20at%209.01.01%20PM.png)
+!["Screenshot: TinyApp landing page"](https://github.com/mradamt/tinyapp/blob/master/docs/landing-page.png)
+!["Screenshot: My URLs, listing user's shortened URLs"](https://github.com/mradamt/tinyapp/blob/master/docs/urls_page.png)
+!["Screenshot: Create new TinyURL"](https://github.com/mradamt/tinyapp/blob/master/docs/create-new-tinyurl.png)
+!["Screenshot: Edit TinyURL and view analytics"](https://github.com/mradamt/tinyapp/blob/master/docs/edit-analytics-url.png)
 
 ## Dependencies
 
