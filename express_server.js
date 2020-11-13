@@ -34,8 +34,20 @@ const users = {
   },
 };
 const urlDatabase = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", user_id: "aaaa", visitors: 0},
-  "9sm5xK": {longURL: "http://www.google.com", user_id: "aaaa", visitors: 0}
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca", 
+    user_id: "aaaa", 
+    uniqueVisits: 0,
+    visitorCount: 0,
+    visits: {}
+  },
+  "9sm5xK": {
+    longURL: "http://www.google.com", 
+    user_id: "aaaa", 
+    uniqueVisits: 0,
+    visitorCount: 0,
+    visits: {}
+  },
 };
 
 
@@ -180,8 +192,7 @@ app.get('/urls/:shortURL', (req, res) => {
   // User owns this shortURL, proceed with edit GET
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    visitors: urlDatabase[req.params.shortURL].visitors,
+    urlObj: urlDatabase[req.params.shortURL],
     user: users[req.session.user_id],
   };
   res.render('urls_show', templateVars);
@@ -228,15 +239,23 @@ app.delete('/urls/:shortURL/delete', (req, res) => {
 
 // VISIT TINYURL (TO BE REDIRECTED TO LONG-URL)
 app.get('/u/:shortURL', (req, res) => {
-  const urlObj = urlDatabase[req.params.shortURL];
+  const shortURL = req.params.shortURL;
+  // Lookup longURL in DB using shortURL (in params)
+  const urlObj = urlDatabase[shortURL];
   if (urlObj) {
-    // Increase view counter by 1
-    urlObj.visitors++
+    // Set visitor cookie if not already set, use shortURL to count clicks per shortURL
+    if (!req.session[shortURL]) {
+      urlObj.uniqueVisits++
+      req.session[shortURL] = shortURL;
+    }
+    // Increment visitorCount, add this visit to timestamps, then redirect
+    urlObj.visitorCount++
+    urlObj.visits[generateRandomString(6)] = new Date()
     return res.redirect(urlObj.longURL);
   }
   res.status(404).send(`
     <h3>404: Page Not Found</h3>
-    <p>ShortURL <strong>u/${req.params.shortURL}</strong> does not redirect anywhere.</p>`);
+    <p>ShortURL <strong>u/${shortURL}</strong> does not redirect anywhere.</p>`);
 });
 
 

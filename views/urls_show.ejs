@@ -11,7 +11,7 @@
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for <a href="<%= longURL %>"><%= longURL %></a></h5>
+        <h5 class="card-title">TinyURL for <a href="<%= urlObj.longURL %>"><%= urlObj.longURL %></a></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
       </div>
       <div class="card-body">
@@ -19,14 +19,38 @@
         <form class="form-inline" action="/urls/<%= shortURL %>?_method=PUT" method="POST">
           <div class="form-group mb-2  mx-auto">
             <label for="longURL">Enter updated URL</label>
-            <input class="form-control" type="text" name="longURL" value="<%= longURL %>"" style="width: 300px; margin: 1em">
+            <input class="form-control" type="text" name="longURL" value="<%= urlObj.longURL %>"" style="width: 300px; margin: 1em">
             <button type="submit" class="btn btn-primary">Update</button>
           </div>
         </form>
       </div>
       <div class="card-body">
-        <p class="card-title">Total clicks through this TinyURL:</p>
-        <h4 class="card-text"><%= visitors %></h4>
+        <p class="card-title">Total clicks:</p>
+        <h4 class="card-text"><%= urlObj.visitorCount %></h4>
+      </div>
+      <div class="card-body">
+        <p class="card-title">Unique visitors:</p>
+        <h4 class="card-text"><%= urlObj.uniqueVisits %></h4>
+      </div>
+      <div class="card-body">
+        <p class="card-title">Visitor list:</p>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Visitor</th>
+                <th scope="col">Timestamp</th>
+              </tr>
+              <tbody>
+                <% for (const [k, v] of Object.entries(urlObj.visits)) { %>
+                  <tr>
+                    <td><%= k%></td>
+                    <td><%= v%></td>
+                  </tr>
+                <% }%>
+              </tbody>
+            </thead>
+          </table>
+        </p>
       </div>
     <div class="card-footer text-muted"></div>
   </div>
