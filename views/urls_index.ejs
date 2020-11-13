@@ -47,15 +47,18 @@
             </tbody>
           </thead>
         </table>
+        <div class="form-inline my-4 mr-sm-2">
+          <a href="/urls/new" class="btn btn-outline-primary mr-2">New TinyURL</a>
+        </div>
       <% } %>
     <% } else { %>
       <h3>TinyApp - the best URL shortener</h3>
       <small>... that I've made, so far</small>
       <p class="mt-4">To use all three fantastic features of TinyApp</p>
       <div class="form-inline my-2 mr-sm-2">
-        <a href="/login" class="btn btn-outline-primary mr-2">Login</a>
-        or
-        <a href="/register" class="btn btn-outline-secondary mx-2">Register</a>
+        <a href="/login" class="btn btn-outline-primary">Login</a>
+        <span class="mx-2">or</span>
+        <a href="/register" class="btn btn-outline-secondary">Register</a>
       </div>
     <% } %>
     </main>
