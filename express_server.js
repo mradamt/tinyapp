@@ -72,6 +72,7 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+
 // VIEW LOGIN PAGE
 app.get('/login', (req, res) => {
   const user = users[req.session.user_id];
@@ -107,6 +108,7 @@ app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/urls');
 });
+
 
 // REDIRECT FROM '/'
 app.get('/', (req, res) => {
@@ -144,6 +146,7 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+
 // PAGE TO CREATE NEW URL
 app.get('/urls/new', (req, res) => {
   const user = users[req.session.user_id];
@@ -152,6 +155,7 @@ app.get('/urls/new', (req, res) => {
   }
   res.render('urls_new', {'user': user});
 });
+
 
 // PAGE TO EDIT EXISTING URL
 app.get('/urls/:shortURL', (req, res) => {
@@ -196,6 +200,7 @@ app.put('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
+
 // DELETE EXISTING URL
 app.delete('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session.user_id];
@@ -214,6 +219,7 @@ app.delete('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
   return res.redirect('/urls');
 });
+
 
 // VISIT TINYURL (TO BE REDIRECTED TO LONG-URL)
 app.get('/u/:shortURL', (req, res) => {
