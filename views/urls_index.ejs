@@ -15,9 +15,6 @@
       <h3>My URLs</h3>
       <% if ( Object.keys(urls).length === 0 ) { %>
         <p class="mt-4">Create a TinyURL</p>
-        <div class="form-inline my-2 mr-sm-2">
-          <a href="/urls/new" class="btn btn-outline-primary mr-2">New TinyURL</a>
-        </div>
       <% } else { %>
         <table class="table">
           <thead>
@@ -47,10 +44,10 @@
             </tbody>
           </thead>
         </table>
+        <% } %>
         <div class="form-inline my-4 mr-sm-2">
           <a href="/urls/new" class="btn btn-outline-primary mr-2">New TinyURL</a>
         </div>
-      <% } %>
     <% } else { %>
       <h3>TinyApp - the best URL shortener</h3>
       <small>... that I've made, so far</small>
