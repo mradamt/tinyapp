@@ -133,9 +133,6 @@ app.get('/', (req, res) => {
 });
 // LIST USER'S URLS
 app.get('/urls', (req, res) => {
-  console.log(urlDatabase)
-  // console.log(users)
-
   // If user not logged in, render urls_index with undefined templateVars
   const user = users[req.session.user_id];
   if (!user) {
