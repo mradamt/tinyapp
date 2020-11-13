@@ -34,8 +34,8 @@ const users = {
   },
 };
 const urlDatabase = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", user_id: "aaaa"},
-  "9sm5xK": {longURL: "http://www.google.com", user_id: "aaaa"}
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", user_id: "aaaa", visitors: 0},
+  "9sm5xK": {longURL: "http://www.google.com", user_id: "aaaa", visitors: 0}
 };
 
 
@@ -121,6 +121,9 @@ app.get('/', (req, res) => {
 });
 // LIST USER'S URLS
 app.get('/urls', (req, res) => {
+  console.log(urlDatabase)
+  // console.log(users)
+
   // If user not logged in, render urls_index with undefined templateVars
   const user = users[req.session.user_id];
   if (!user) {
@@ -178,6 +181,7 @@ app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
+    visitors: urlDatabase[req.params.shortURL].visitors,
     user: users[req.session.user_id],
   };
   res.render('urls_show', templateVars);
@@ -226,6 +230,8 @@ app.delete('/urls/:shortURL/delete', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const urlObj = urlDatabase[req.params.shortURL];
   if (urlObj) {
+    // Increase view counter by 1
+    urlObj.visitors++
     return res.redirect(urlObj.longURL);
   }
   res.status(404).send(`
