@@ -106,7 +106,7 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-// LIST USER'S URLS
+// REDIRECT FROM '/'
 app.get('/', (req, res) => {
   const user = users[req.session.user_id];
   // If user not logged in, redirect to /login
@@ -115,11 +115,8 @@ app.get('/', (req, res) => {
   }
   res.redirect('/urls');
 });
+// LIST USER'S URLS
 app.get('/urls', (req, res) => {
-  // Log to console current status of both databases
-  console.log(users);
-  console.log(JSON.stringify(urlDatabase, null, 2));
-  
   const user = users[req.session.user_id];
   if (!user) {
     return res.render('urls_index', {urls: undefined, user: undefined});
@@ -216,7 +213,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   return res.redirect('/urls');
 });
 
-// VISIT TINYURL (FOR REDIRECT)
+// VISIT TINYURL (TO BE REDIRECTED TO LONG-URL)
 app.get('/u/:shortURL', (req, res) => {
   const urlObj = urlDatabase[req.params.shortURL];
   if (urlObj) {
