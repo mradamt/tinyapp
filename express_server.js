@@ -40,6 +40,11 @@ const urlDatabase = {
 /* Define routes (sorted by route then method) */
 // VIEW REGISTER PAGE
 app.get('/register', (req, res) => {
+  const user = users[req.session.user_id];
+  // If user is logged in, redirect to /urls
+  if (user) {
+    return res.redirect('/urls');
+  }
   const templateVars = {
     user: users[req.session.user_id],
   };
@@ -67,6 +72,11 @@ app.post('/register', (req, res) => {
 
 // VIEW LOGIN PAGE
 app.get('/login', (req, res) => {
+  const user = users[req.session.user_id];
+  // If user is logged in, redirect to /urls
+  if (user) {
+    return res.redirect('/urls');
+  }
   res.render('login', {user: undefined});
 });
 // POST: USER LOGIN AND AUTHENTICATION
@@ -98,6 +108,11 @@ app.post('/logout', (req, res) => {
 
 // LIST USER'S URLS
 app.get('/', (req, res) => {
+  const user = users[req.session.user_id];
+  // If user not logged in, redirect to /login
+  if (!user) {
+    return res.redirect('/login');
+  }
   res.redirect('/urls');
 });
 app.get('/urls', (req, res) => {
@@ -117,11 +132,17 @@ app.get('/urls', (req, res) => {
 });
 // POST: GENERATE NEW URL
 app.post('/urls', (req, res) => {
+  const user = users[req.session.user_id];
+  // If user not logged in, return status 401
+  if (!user) {
+    return res.status(401).send(`
+      <h3>401: Unauthorised</h3>
+      <p>You do not have permission to perform this action</p>`);
+  }
   // Add longURL from req.body to urlDatabase with key = new random string length 6
   const shortURL = generateRandomString(6);
   urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.session.user_id };
-  /* Preferred behaviour: redirect to /urls after new url creation, otherwise: // res.redirect(`/urls/${shortURL}`) */
-  res.redirect(`/urls/`);
+  res.redirect(`/urls/${shortURL}`);
 });
 
 // PAGE TO CREATE NEW URL
@@ -136,9 +157,11 @@ app.get('/urls/new', (req, res) => {
 // PAGE TO EDIT EXISTING URL
 app.get('/urls/:shortURL', (req, res) => {
   const user = users[req.session.user_id];
-  // If user not logged in, redirect to login
+  // If user not logged in, return status 401
   if (!user) {
-    return res.status(304).redirect('/login');
+    return res.status(401).send(`
+      <h3>401: Unauthorised</h3>
+      <p>You do not have permission to edit this record</p>`);
   }
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   // If user does not 'own' this shortURL return 401
@@ -158,6 +181,12 @@ app.get('/urls/:shortURL', (req, res) => {
 // POST: EDIT EXISTING URL
 app.post('/urls/:shortURL', (req, res) => {
   const user = users[req.session.user_id];
+  // If user not logged in, return status 401
+  if (!user) {
+    return res.status(401).send(`
+      <h3>401: Unauthorised</h3>
+      <p>You do not have permission to edit this record</p>`);
+  }
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
@@ -171,6 +200,12 @@ app.post('/urls/:shortURL', (req, res) => {
 // DELETE EXISTING URL
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = users[req.session.user_id];
+  // If user not logged in, return status 401
+  if (!user) {
+    return res.status(401).send(`
+      <h3>401: Unauthorised</h3>
+      <p>You do not have permission to edit this record</p>`);
+  }
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   // If user does not 'own' this shortURL return 401
   if (!usersShortURLs.includes(req.params.shortURL)) {
@@ -189,7 +224,7 @@ app.get('/u/:shortURL', (req, res) => {
   }
   res.status(404).send(`
     <h3>404: Page Not Found</h3>
-    <p>ShortURL <strong>u/${req.params.shortURL}</strong> does not exist.</p>`);
+    <p>ShortURL <strong>u/${req.params.shortURL}</strong> does not redirect anywhere.</p>`);
 });
 
 
