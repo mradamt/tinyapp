@@ -155,7 +155,7 @@ app.post('/urls', (req, res) => {
   }
   // Add longURL from req.body to urlDatabase with key = new random string length 6
   const shortURL = generateRandomString(6);
-  urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.session.user_id };
+  urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.session.user_id, visits: {} };
   res.redirect(`/urls/${shortURL}`);
 });
 
