@@ -70,11 +70,21 @@ app.post('/register', (req, res) => {
   const plainPassword = req.body.password;
   // If email or password are blank, return status 400
   if (!email || !plainPassword) {
-    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>');
+    return res.status(400).render('error', {
+      user: undefined,
+      code: 400,
+      text: 'Email and Password must be non-empty',
+      action: '/register'
+    })
   }
   // If email already exists in DB, return status 400
   if (lookupUserByKey(users, 'email', email)) {
-    return res.status(400).send(`<h3>Error:</h3><p><em>${email}</em> is already registered</p>`);
+    return res.status(400).render('error', {
+      user: undefined,
+      code: 400,
+      text: `<em>${email}</em> is already registered`,
+      action: '/register'
+    })
   }
   // Generate new id, hash password, then add this new user object to users
   const id = generateRandomString(4);
@@ -100,16 +110,31 @@ app.post('/login', (req, res) =>{
   const plainPassword = req.body.password;
   // If email or password are blank, return status 400
   if (!email || !plainPassword) {
-    return res.status(400).send('<h3>Error:</h3><p>Email and Password must be non-empty</p>');
+    return res.status(400).render('error', {
+      user: undefined,
+      code: 400,
+      text: 'Email and Password must be non-empty',
+      action: '/login'
+    })
   }
   // Confirm user exists
   user = lookupUserByKey(users, 'email', email);
   if (!user) {
-    return res.status(403).send('<h3>Error:</h3><p>User account not found</p>');
+    return res.status(400).render('error', {
+      user: undefined,
+      code: 400,
+      text: `User account or password not found`,
+      action: '/login'
+    })
   }
   // Confirm password is correct
   if (!bcrypt.compareSync(plainPassword, user.password)) {
-    return res.status(403).send('<h3>Error:</h3><p>Permission denied</p>');
+    return res.status(400).render('error', {
+      user: undefined,
+      code: 400,
+      text: `User account or password not found`,
+      action: '/login'
+    })
   }
   const id = user.id;
   req.session.user_id = id;
@@ -149,9 +174,12 @@ app.post('/urls', (req, res) => {
   const user = users[req.session.user_id];
   // If user not logged in, return status 401
   if (!user) {
-    return res.status(401).send(`
-      <h3>401: Unauthorised</h3>
-      <p>You do not have permission to perform this action</p>`);
+    return res.status(401).render('error', {
+      user: undefined,
+      code: 401,
+      text: `Unauthorised. You do not have permission to perform this action.`,
+      action: '/login'
+    })
   }
   // Add longURL from req.body to urlDatabase with key = new random string length 6
   const shortURL = generateRandomString(6);
@@ -175,16 +203,22 @@ app.get('/urls/:shortURL', (req, res) => {
   // If user not logged in, return status 401
   const user = users[req.session.user_id];
   if (!user) {
-    return res.status(401).send(`
-      <h3>401: Unauthorised</h3>
-      <p>You do not have permission to edit this record</p>`);
+    return res.status(401).render('error', {
+      user: undefined,
+      code: 401,
+      text: `Unauthorised. You do not have permission to edit this record.`,
+      action: '/login'
+    })
   }
   // If user does not 'own' this shortURL return 401
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   if (!usersShortURLs.includes(req.params.shortURL)) {
-    return res.status(401).send(`
-      <h3>401: Unauthorised</h3>
-      <p>You do not have permission to edit this record</p>`);
+    return res.status(401).render('error', {
+      user: user,
+      code: 401,
+      text: `Unauthorised. You do not have permission to edit this record.`,
+      action: '/urls'
+    })
   }
   // User owns this shortURL, proceed with edit GET
   const templateVars = {
@@ -199,14 +233,22 @@ app.put('/urls/:shortURL', (req, res) => {
   // If user not logged in, return status 401
   const user = users[req.session.user_id];
   if (!user) {
-    return res.status(401).send(`
-      <h3>401: Unauthorised</h3>
-      <p>You do not have permission to edit this record</p>`);
+    return res.status(401).render('error', {
+      user: undefined,
+      code: 401,
+      text: `Unauthorised. You do not have permission to edit this record.`,
+      action: '/login'
+    })
   }
   // If user does not 'own' this shortURL return 401
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   if (!usersShortURLs.includes(req.params.shortURL)) {
-    return res.status(401).send('401: Unauthorised. You do not have permission to edit this record');
+    return res.status(401).render('error', {
+      user: user,
+      code: 401,
+      text: `Unauthorised. You do not have permission to edit this record.`,
+      action: '/urls'
+    })
   }
   // User owns this shortURL, proceed with edit POST
   urlDatabase[req.params.shortURL].longURL = req.body.longURL;
@@ -219,14 +261,22 @@ app.delete('/urls/:shortURL/delete', (req, res) => {
   // If user not logged in, return status 401
   const user = users[req.session.user_id];
   if (!user) {
-    return res.status(401).send(`
-      <h3>401: Unauthorised</h3>
-      <p>You do not have permission to edit this record</p>`);
+    return res.status(401).render('error', {
+      user: undefined,
+      code: 401,
+      text: `Unauthorised. You do not have permission to edit this record.`,
+      action: '/login'
+    })
   }
   // If user does not 'own' this shortURL return 401
   const usersShortURLs = Object.keys(urlsForUser(urlDatabase, user.id));
   if (!usersShortURLs.includes(req.params.shortURL)) {
-    return res.status(401).send('401: Unauthorised. You do not have permission to delete this record');
+    return res.status(401).render('error', {
+      user: user,
+      code: 401,
+      text: `Unauthorised. You do not have permission to delete this record.`,
+      action: '/urls'
+    })
   }
   // User owns this shortURL, proceed with delete POST
   delete urlDatabase[req.params.shortURL];
@@ -250,15 +300,23 @@ app.get('/u/:shortURL', (req, res) => {
     urlObj.visits[generateRandomString(6)] = new Date()
     return res.redirect(urlObj.longURL);
   }
-  res.status(404).send(`
-    <h3>404: Page Not Found</h3>
-    <p>ShortURL <strong>u/${shortURL}</strong> does not redirect anywhere.</p>`);
+  res.status(404).render('error', {
+    user: users[req.session.user_id],
+    code: 404,
+    text: `Page Not Found. <br/><br/>TinyURL '<em>u/${shortURL}</em>' does not redirect anywhere.`,
+    action: '/urls'
+  })
 });
 
 
 // CATCHALL ERROR HANDLER FOR NON-EXISTANT ROUTES
 app.use(function(req, res, next) {
-  return res.status(404).send(`<h3>404: Page Not Found</h3>`);
+  return res.status(404).render('error', {
+    user: users[req.session.user_id],
+    code: 404,
+    text: `Page Not Found`,
+    action: '/'
+  })
 });
 
 
