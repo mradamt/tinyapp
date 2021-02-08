@@ -29,3 +29,4 @@ Basic analytics are provided on the Edit page for each short URL:
 
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `node express_server.js` command.
+- To run with Nodemon use `./node_modules/.bin/nodemon -L express_server.js`
